@@ -25,15 +25,9 @@ import (
 )
 
 const CreateClusterWorkflowName = "pke-create-cluster"
-const pkeVersion = "0.4.17"
+const pkeVersion = "0.4.20"
 
 func getDefaultImageID(region, kubernetesVersion string) (string, error) {
-
-	constraint113, err := semver.NewConstraint("~1.13.0")
-	if err != nil {
-		return "", errors.Wrap(err, "could not create semver constraint for Kubernetes version 1.13+")
-	}
-
 	constraint114, err := semver.NewConstraint("~1.14.0")
 	if err != nil {
 		return "", errors.Wrap(err, "could not create semver constraint for Kubernetes version 1.14+")
@@ -44,74 +38,105 @@ func getDefaultImageID(region, kubernetesVersion string) (string, error) {
 		return "", errors.Wrap(err, "could not create semver constraint for Kubernetes version 1.15+")
 	}
 
+	constraint116, err := semver.NewConstraint("~1.16.0")
+	if err != nil {
+		return "", errors.Wrap(err, "could not create semver constraint for Kubernetes version 1.16+")
+	}
+
+	constraint117, err := semver.NewConstraint("~1.17.0")
+	if err != nil {
+		return "", errors.Wrap(err, "could not create semver constraint for Kubernetes version 1.17+")
+	}
+
 	kubeVersion, err := semver.NewVersion(kubernetesVersion)
 	if err != nil {
 		return "", errors.WithDetails(err, "could not create semver from Kubernetes version", "kubernetesVersion", kubernetesVersion)
 	}
 
 	switch {
-	case constraint113.Check(kubeVersion):
-		return map[string]string{
-			"ap-east-1":      "ami-04cd6dc5c53a1f08c", // Asia Pacific (Hong Kong).
-			"ap-northeast-1": "ami-0ed7959a76acaa682", // Asia Pacific (Tokyo).
-			"ap-northeast-2": "ami-0e81b2d55656a1191", // Asia Pacific (Seoul).
-			"ap-southeast-1": "ami-09ede0029b72b3c33", // Asia Pacific (Mumbai).
-			"ap-southeast-2": "ami-011932d1e814b2ff6", // Asia Pacific (Singapore).
-			"ap-south-1":     "ami-087968379b6d38ad9", // Asia Pacific (Sydney).
-			"ca-central-1":   "ami-05cc925b34abdcbce", // Canada (Central).
-			"eu-central-1":   "ami-08870347bf63fc0a9", // EU (Frankfurt).
-			"eu-north-1":     "ami-0652a3bb23e943a7b", // EU (Stockholm).
-			"eu-west-1":      "ami-05508eabfd52a5730", // EU (Ireland).
-			"eu-west-2":      "ami-01f5d06890666ef1d", // EU (London).
-			"eu-west-3":      "ami-0b0d81786e9237908", // EU (Paris).
-			"me-south-1":     "ami-04960cff5909f3ded", // Middle East (Bahrain).
-			"sa-east-1":      "ami-089207a5c493f704e", // South America (Sao Paulo)
-			"us-east-1":      "ami-0a877f2c3f30f65bd", // US East (N. Virginia).
-			"us-east-2":      "ami-02c3b3314bc411937", // US East (Ohio).
-			"us-west-1":      "ami-0cfc4d351b908d353", // US West (N. California).
-			"us-west-2":      "ami-040319fe85c2056a8", // US West (Oregon).
-		}[region], nil
 	case constraint114.Check(kubeVersion):
 		return map[string]string{
-			"ap-east-1":      "ami-05b7d0a24532c4fd7", // Asia Pacific (Hong Kong).
-			"ap-northeast-1": "ami-0e1b4c30b002f8e0d", // Asia Pacific (Tokyo).
-			"ap-northeast-2": "ami-08f4975c69ebfd30b", // Asia Pacific (Seoul).
-			"ap-southeast-1": "ami-09ab46415bc4d60e6", // Asia Pacific (Mumbai).
-			"ap-southeast-2": "ami-08d5d96e915dcbd6e", // Asia Pacific (Singapore).
-			"ap-south-1":     "ami-053244ef9703cd00d", // Asia Pacific (Sydney).
-			"ca-central-1":   "ami-086454b3b6fede54a", // Canada (Central).
-			"eu-central-1":   "ami-088dbc498c9bd9170", // EU (Frankfurt).
-			"eu-north-1":     "ami-0520b1493fdd02f30", // EU (Stockholm).
-			"eu-west-1":      "ami-04761c847f867ca28", // EU (Ireland).
-			"eu-west-2":      "ami-0116519a435ccba1e", // EU (London).
-			"eu-west-3":      "ami-057fe3a4eb5f3a315", // EU (Paris).
-			"me-south-1":     "ami-004f42337db5f4bfa", // Middle East (Bahrain).
-			"sa-east-1":      "ami-05b071461b07f2392", // South America (Sao Paulo)
-			"us-east-1":      "ami-0bc17d9b8be975338", // US East (N. Virginia).
-			"us-east-2":      "ami-0bad13677d32b0959", // US East (Ohio).
-			"us-west-1":      "ami-0a3892fa4e09e0c84", // US West (N. California).
-			"us-west-2":      "ami-02904d39ae2ed2a7e", // US West (Oregon).
+			"ap-east-1":      "ami-006502ed43c36f1e0", // Asia Pacific (Hong Kong).
+			"ap-northeast-1": "ami-06b79d0ef4c299d15", // Asia Pacific (Tokyo).
+			"ap-northeast-2": "ami-00917002b22a5eaca", // Asia Pacific (Seoul).
+			"ap-southeast-1": "ami-0699853ac47eb0175", // Asia Pacific (Mumbai).
+			"ap-southeast-2": "ami-04643737f234b7cbe", // Asia Pacific (Singapore).
+			"ap-south-1":     "ami-066dc3074af614d50", // Asia Pacific (Sydney).
+			"ca-central-1":   "ami-0250c7c8a2327cff9", // Canada (Central).
+			"eu-central-1":   "ami-0262cb8ddc17aec3e", // EU (Frankfurt).
+			"eu-north-1":     "ami-05a2faa4135c3ffc0", // EU (Stockholm).
+			"eu-west-1":      "ami-0963cc3135ef6050f", // EU (Ireland).
+			"eu-west-2":      "ami-0b7eb3d3d73bed69b", // EU (London).
+			"eu-west-3":      "ami-05bb8d1aef64fe0af", // EU (Paris).
+			"me-south-1":     "ami-00b950d5c66e8fb95", // Middle East (Bahrain).
+			"sa-east-1":      "ami-02c253419683aa2c8", // South America (Sao Paulo)
+			"us-east-1":      "ami-01839e8c6bd95881c", // US East (N. Virginia).
+			"us-east-2":      "ami-020250a080ebb188f", // US East (Ohio).
+			"us-west-1":      "ami-0cafcb1bcf45153b8", // US West (N. California).
+			"us-west-2":      "ami-01e516ad29fa3f529", // US West (Oregon).
 		}[region], nil
 	case constraint115.Check(kubeVersion):
 		return map[string]string{
-			"ap-east-1":      "ami-0c906c5a886224f2c", // Asia Pacific (Hong Kong).
-			"ap-northeast-1": "ami-048cd136c9d3752d6", // Asia Pacific (Tokyo).
-			"ap-northeast-2": "ami-0c2517ca3fd4e157e", // Asia Pacific (Seoul).
-			"ap-southeast-1": "ami-0186d86b776b8dc8b", // Asia Pacific (Mumbai).
-			"ap-southeast-2": "ami-0af43abdd3d123f8a", // Asia Pacific (Singapore).
-			"ap-south-1":     "ami-02ba2b7be8eb99b34", // Asia Pacific (Sydney).
-			"ca-central-1":   "ami-0644ae9cb4750efd5", // Canada (Central).
-			"eu-central-1":   "ami-0ccf38993187a12ff", // EU (Frankfurt).
-			"eu-north-1":     "ami-01ba2867145e54525", // EU (Stockholm).
-			"eu-west-1":      "ami-0e91b1f208d945645", // EU (Ireland).
-			"eu-west-2":      "ami-0fc75cd793034847b", // EU (London).
-			"eu-west-3":      "ami-0a362008b150c6f60", // EU (Paris).
-			"me-south-1":     "ami-0813b61c2db464b11", // Middle East (Bahrain).
-			"sa-east-1":      "ami-01f61154ea7d72f00", // South America (Sao Paulo)
-			"us-east-1":      "ami-09882d44c73fabe37", // US East (N. Virginia).
-			"us-east-2":      "ami-03a405f0e64a8cfe0", // US East (Ohio).
-			"us-west-1":      "ami-062b015f7ca2803f2", // US West (N. California).
-			"us-west-2":      "ami-09e2678e579e5b06f", // US West (Oregon).
+			"ap-east-1":      "ami-0e68783263a9cf78d", // Asia Pacific (Hong Kong).
+			"ap-northeast-1": "ami-071e8a5f173e27c91", // Asia Pacific (Tokyo).
+			"ap-northeast-2": "ami-0642216b8945ff064", // Asia Pacific (Seoul).
+			"ap-southeast-1": "ami-0c8d4a8f06fdf6985", // Asia Pacific (Mumbai).
+			"ap-southeast-2": "ami-0c9da81852ed80a4d", // Asia Pacific (Singapore).
+			"ap-south-1":     "ami-084cd316e932210e5", // Asia Pacific (Sydney).
+			"ca-central-1":   "ami-0dc557b6e2afcbe1c", // Canada (Central).
+			"eu-central-1":   "ami-0510259b123b721dd", // EU (Frankfurt).
+			"eu-north-1":     "ami-03c1e19992e372497", // EU (Stockholm).
+			"eu-west-1":      "ami-0de02e98881a51053", // EU (Ireland).
+			"eu-west-2":      "ami-06857a6dd2f0d0b06", // EU (London).
+			"eu-west-3":      "ami-051696b266427c5d0", // EU (Paris).
+			"me-south-1":     "ami-02e0b86a2bbd7af80", // Middle East (Bahrain).
+			"sa-east-1":      "ami-0fa22db8555af068d", // South America (Sao Paulo)
+			"us-east-1":      "ami-00e84f2147ea05b7d", // US East (N. Virginia).
+			"us-east-2":      "ami-06a2ea25f36e8d71e", // US East (Ohio).
+			"us-west-1":      "ami-037ec3d09188ce2e8", // US West (N. California).
+			"us-west-2":      "ami-04f69475931368929", // US West (Oregon).
+		}[region], nil
+	case constraint116.Check(kubeVersion):
+		return map[string]string{
+			"ap-east-1":      "ami-04747c7e79d680861", // Asia Pacific (Hong Kong).
+			"ap-northeast-1": "ami-073d36d2adbe8df22", // Asia Pacific (Tokyo).
+			"ap-northeast-2": "ami-044dc3710aec6bda2", // Asia Pacific (Seoul).
+			"ap-southeast-1": "ami-0f2df6c8904cea273", // Asia Pacific (Mumbai).
+			"ap-southeast-2": "ami-0847661b0ea0a16f3", // Asia Pacific (Singapore).
+			"ap-south-1":     "ami-0ffde937c97549195", // Asia Pacific (Sydney).
+			"ca-central-1":   "ami-098796bfbc41f56e4", // Canada (Central).
+			"eu-central-1":   "ami-0694a7ff505c8ed29", // EU (Frankfurt).
+			"eu-north-1":     "ami-0ada97dcd3204440e", // EU (Stockholm).
+			"eu-west-1":      "ami-0c99ebf013429a613", // EU (Ireland).
+			"eu-west-2":      "ami-02ed905f5b04c3854", // EU (London).
+			"eu-west-3":      "ami-0cde39fa998412e45", // EU (Paris).
+			"me-south-1":     "ami-07b0665efde3f138d", // Middle East (Bahrain).
+			"sa-east-1":      "ami-08d6c6c053330f17d", // South America (Sao Paulo)
+			"us-east-1":      "ami-0ef61beb3758fe352", // US East (N. Virginia).
+			"us-east-2":      "ami-0db2f094dc2e2bee0", // US East (Ohio).
+			"us-west-1":      "ami-014230d9402b8d24a", // US West (N. California).
+			"us-west-2":      "ami-0e6b60ca96ed4b14d", // US West (Oregon).
+		}[region], nil
+	case constraint117.Check(kubeVersion):
+		return map[string]string{
+			"ap-east-1":      "ami-05efbc5ab88627782", // Asia Pacific (Hong Kong).
+			"ap-northeast-1": "ami-029e9ba67ee82dc4d", // Asia Pacific (Tokyo).
+			"ap-northeast-2": "ami-0b65e717fe249c0ff", // Asia Pacific (Seoul).
+			"ap-southeast-1": "ami-0cfb85f0e835e6383", // Asia Pacific (Mumbai).
+			"ap-southeast-2": "ami-07c71ce7e60f7bc62", // Asia Pacific (Singapore).
+			"ap-south-1":     "ami-0d92f5d7671a5dcff", // Asia Pacific (Sydney).
+			"ca-central-1":   "ami-039475a379637e8fe", // Canada (Central).
+			"eu-central-1":   "ami-040427722442fc2da", // EU (Frankfurt).
+			"eu-north-1":     "ami-052de689064e9f8dd", // EU (Stockholm).
+			"eu-west-1":      "ami-015c5cce5437e3e4d", // EU (Ireland).
+			"eu-west-2":      "ami-065fcd206187b9ab4", // EU (London).
+			"eu-west-3":      "ami-015dca36371402365", // EU (Paris).
+			"me-south-1":     "ami-0ddf598d13adaccaf", // Middle East (Bahrain).
+			"sa-east-1":      "ami-076dd78575e897e72", // South America (Sao Paulo)
+			"us-east-1":      "ami-083c6b4ab7ef0ad6e", // US East (N. Virginia).
+			"us-east-2":      "ami-03bafcd2e99ea839d", // US East (Ohio).
+			"us-west-1":      "ami-090ca189fb3845efc", // US West (N. California).
+			"us-west-2":      "ami-0410cd92f04001ee0", // US West (Oregon).
 		}[region], nil
 	default:
 		return map[string]string{
