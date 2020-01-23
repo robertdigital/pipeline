@@ -95,6 +95,9 @@ type ClusterConfig struct {
 
 	Labels clusterconfig.LabelConfig
 
+	// Ingress controller config
+	Traefik TraefikConfig
+
 	// Features
 	Vault        ClusterVaultConfig
 	Monitoring   ClusterMonitoringConfig
@@ -178,6 +181,13 @@ func (c *ClusterConfig) Process() error {
 	}
 
 	return nil
+}
+
+type TraefikConfig struct {
+	Enabled        bool
+	GenerateTLS    bool
+	DefaultCN      string
+	DefaultSANList []string
 }
 
 // ClusterVaultConfig contains cluster vault configuration.
@@ -483,6 +493,12 @@ func Configure(v *viper.Viper, _ *pflag.FlagSet) {
 	v.SetDefault("cluster::securityScan::anchore::password", "")
 
 	v.SetDefault("cluster::expiry::enabled", true)
+
+	// ingress controller config
+	v.SetDefault("cluster::traefik::ssl::enabled", true)
+	v.SetDefault("cluster::traefik::ssl::generateTLS", true)
+	v.SetDefault("cluster::traefik::ssl::defaultCN", "")
+	v.SetDefault("cluster::traefik::ssl::defaultSANList", []string{})
 
 	v.SetDefault("cluster::disasterRecovery::enabled", true)
 	v.SetDefault("cluster::disasterRecovery::namespace", "")
