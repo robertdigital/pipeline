@@ -20,13 +20,14 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/ghodss/yaml"
+
 	"github.com/banzaicloud/pipeline/internal/global"
 	"github.com/banzaicloud/pipeline/internal/providers/amazon"
 	pkgCluster "github.com/banzaicloud/pipeline/pkg/cluster"
 	pkgHelm "github.com/banzaicloud/pipeline/pkg/helm"
 	"github.com/banzaicloud/pipeline/src/auth"
 	"github.com/banzaicloud/pipeline/src/dns"
-	"github.com/ghodss/yaml"
 )
 
 type ingressControllerValues struct {

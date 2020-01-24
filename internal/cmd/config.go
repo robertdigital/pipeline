@@ -21,7 +21,6 @@ import (
 	"time"
 
 	"emperror.dev/errors"
-	"github.com/banzaicloud/pipeline/pkg/cluster"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 
@@ -31,6 +30,7 @@ import (
 	"github.com/banzaicloud/pipeline/internal/integratedservices/services/logging"
 	"github.com/banzaicloud/pipeline/internal/integratedservices/services/monitoring"
 	"github.com/banzaicloud/pipeline/internal/integratedservices/services/vault"
+	"github.com/banzaicloud/pipeline/pkg/cluster"
 )
 
 // AuthOIDCConfig contains OIDC auth configuration.
