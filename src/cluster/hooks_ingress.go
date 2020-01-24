@@ -27,7 +27,6 @@ import (
 	"github.com/banzaicloud/pipeline/src/auth"
 	"github.com/banzaicloud/pipeline/src/dns"
 	"github.com/ghodss/yaml"
-	"github.com/spf13/viper"
 )
 
 type ingressControllerValues struct {
@@ -53,46 +52,51 @@ type serviceTraefikValues struct {
 }
 
 // InstallIngressControllerPostHook post hooks can't return value, they can log error and/or update state?
-func InstallIngressControllerPostHook(cluster CommonCluster) error {
+func InstallIngressControllerPostHook(cluster CommonCluster, config pkgCluster.PostHookConfig) error {
 	orgID := cluster.GetOrganizationId()
 	organization, err := auth.GetOrganizationById(orgID)
 	if err != nil {
 		return errors.WrapIfWithDetails(err, "failed to get organization", "organizationId", orgID)
 	}
 
+	var orgDomainName string
+	var wildcardOrgDomainName string
 	var baseDomain = strings.ToLower(global.Config.Cluster.DNS.BaseDomain)
-	if baseDomain == "" {
-		baseDomain = "banzaicloud.io"
+	if baseDomain != "" {
+		orgDomainName = strings.ToLower(fmt.Sprintf("%s.%s", organization.NormalizedName, baseDomain))
+		err = dns.ValidateSubdomain(orgDomainName)
+		if err != nil {
+			return errors.WrapIf(err, "invalid domain for TLS cert")
+		}
+
+		wildcardOrgDomainName = fmt.Sprintf("*.%s", orgDomainName)
+		err = dns.ValidateWildcardSubdomain(wildcardOrgDomainName)
+		if err != nil {
+			return errors.WrapIf(err, "invalid wildcard domain for TLS cert")
+		}
 	}
 
-	orgDomainName := strings.ToLower(fmt.Sprintf("%s.%s", organization.NormalizedName, baseDomain))
-	err = dns.ValidateSubdomain(orgDomainName)
-	if err != nil {
-		return errors.WrapIf(err, "invalid domain for TLS cert")
-	}
-
-	wildcardOrgDomainName := fmt.Sprintf("*.%s", orgDomainName)
-	err = dns.ValidateWildcardSubdomain(wildcardOrgDomainName)
-	if err != nil {
-		return errors.WrapIf(err, "invalid wildcard domain for TLS cert")
-	}
-
-	// TODO (colin) use TraefikConfig struct instead of viper directly
 	// get defaultCN from config
-	var defaultCN = viper.GetString("cluster::traefik::ssl::defaultCN")
+	var defaultCN = config.Traefik.SSL.DefaultCN
 	if defaultCN == "" {
 		defaultCN = orgDomainName
 	}
 
 	// get defaultSANList from config
-	var defaultSANList = viper.GetStringSlice("cluster::traefik::ssl::defaultSANList")
+	var defaultSANList = config.Traefik.SSL.DefaultSANList
 	if len(defaultSANList) == 0 {
-		defaultSANList = []string{orgDomainName, wildcardOrgDomainName}
+		if orgDomainName != "" {
+			defaultSANList = append(defaultSANList, orgDomainName)
+		}
+
+		if wildcardOrgDomainName != "" {
+			defaultSANList = append(defaultSANList, wildcardOrgDomainName)
+		}
 	}
 
 	// get enabled from config
-	var enabled = viper.GetBool("cluster::traefik::ssl::enabled")
-	var generateTLS = viper.GetBool("cluster::traefik::ssl::generateTLS")
+	var enabled = config.Traefik.SSL.Enabled
+	var generateTLS = config.Traefik.SSL.GenerateTLS
 
 	var ingressValues = ingressControllerValues{
 		Traefik: traefikValues{
@@ -124,6 +128,8 @@ func InstallIngressControllerPostHook(cluster CommonCluster) error {
 	}
 
 	namespace := global.Config.Cluster.Namespace
+
+	fmt.Println(string(ingressValuesJson))
 
 	return installDeployment(cluster, namespace, pkgHelm.BanzaiRepository+"/pipeline-cluster-ingress", "ingress", ingressValuesJson, "", false)
 }

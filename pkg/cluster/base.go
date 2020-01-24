@@ -122,6 +122,22 @@ type ScaleOptions struct {
 // PostHookParam describes posthook params in create request
 type PostHookParam interface{}
 
+type PostHookConfig struct {
+	// ingress controller config
+	Traefik TraefikConfig
+}
+
+type TraefikConfig struct {
+	SSL SSLConfig
+}
+
+type SSLConfig struct {
+	Enabled        bool
+	GenerateTLS    bool
+	DefaultCN      string
+	DefaultSANList []string
+}
+
 // GenTLSForLogging describes the TLS related params for Logging
 type GenTLSForLogging struct {
 	TLSEnabled       bool   `json:"tlsEnabled" binding:"required"`
