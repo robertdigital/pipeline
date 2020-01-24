@@ -80,7 +80,7 @@ func InstallIngressControllerPostHook(cluster CommonCluster, config pkgCluster.P
 	// get defaultCN from config
 	var defaultCN = config.Traefik.SSL.DefaultCN
 	if defaultCN == "" {
-		defaultCN = wildcardOrgDomainName
+		defaultCN = orgDomainName
 	}
 
 	// get defaultSANList from config
@@ -129,6 +129,8 @@ func InstallIngressControllerPostHook(cluster CommonCluster, config pkgCluster.P
 	}
 
 	namespace := global.Config.Cluster.Namespace
+
+	fmt.Println(string(ingressValuesJson))
 
 	return installDeployment(cluster, namespace, pkgHelm.BanzaiRepository+"/pipeline-cluster-ingress", "ingress", ingressValuesJson, "", false)
 }
