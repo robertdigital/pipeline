@@ -359,6 +359,14 @@ dex:
 #
 #                # See https://github.com/kubernetes-sigs/kubefed/tree/master/charts/kubefed for details
 #                values: {}
+#
+#    posthook:
+#        traefik:
+#            ssl:
+#                enabled: true
+#                generateTLS: false
+#                defaultCN: ""
+#                defaultSANList:
 
 #helm:
 #    home: "./var/cache"
